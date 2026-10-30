@@ -1,5 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 import { apiErrorMessage } from '../../../../core/http/api-error';
 import { Client } from '../../models/client.model';
@@ -15,7 +16,7 @@ interface Notice {
 /** Pantalla con la lista de clientes. Eliminar pide confirmación en la misma fila. */
 @Component({
   selector: 'app-client-list',
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './client-list.html',
   styleUrl: './client-list.css',
 })
@@ -29,6 +30,11 @@ export class ClientList {
   protected readonly confirmingId = signal<number | null>(null);
 
   constructor() {
+    // El formulario envía aquí el mensaje de éxito ("Cliente ... registrado.") al volver a la lista.
+    const savedNotice = inject(Router).currentNavigation()?.extras.state?.['notice'];
+    if (typeof savedNotice === 'string') {
+      this.notice.set({ kind: 'success', text: savedNotice });
+    }
     this.load();
   }
 

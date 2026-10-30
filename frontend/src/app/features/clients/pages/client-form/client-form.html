@@ -1,0 +1,60 @@
+<a class="back" routerLink="/clients">← Volver a clientes</a>
+<h1>{{ isEdit ? 'Editar cliente' : 'Registrar cliente' }}</h1>
+
+<form class="panel" [formGroup]="form" (ngSubmit)="save()" novalidate>
+  @if (formError()) {
+    <p class="form-error" role="alert">{{ formError() }}</p>
+  }
+
+  <div class="fields">
+    <div class="field">
+      <label for="identificationType">Tipo de identificación</label>
+      <select id="identificationType" formControlName="identificationType" [class.invalid]="errorFor('identificationType')">
+        <option value="" disabled>Selecciona un tipo</option>
+        @for (option of typeOptions; track option[0]) {
+          <option [value]="option[0]">{{ option[1] }}</option>
+        }
+      </select>
+      @if (errorFor('identificationType'); as error) { <small class="error">{{ error }}</small> }
+    </div>
+
+    <div class="field">
+      <label for="identificationNumber">Número de identificación</label>
+      <input id="identificationNumber" formControlName="identificationNumber" autocomplete="off"
+             [class.invalid]="errorFor('identificationNumber')" />
+      @if (errorFor('identificationNumber'); as error) { <small class="error">{{ error }}</small> }
+    </div>
+
+    <div class="field">
+      <label for="firstNames">Nombres</label>
+      <input id="firstNames" formControlName="firstNames" autocomplete="given-name" [class.invalid]="errorFor('firstNames')" />
+      @if (errorFor('firstNames'); as error) { <small class="error">{{ error }}</small> }
+    </div>
+
+    <div class="field">
+      <label for="lastName">Apellido</label>
+      <input id="lastName" formControlName="lastName" autocomplete="family-name" [class.invalid]="errorFor('lastName')" />
+      @if (errorFor('lastName'); as error) { <small class="error">{{ error }}</small> }
+    </div>
+
+    <div class="field">
+      <label for="email">Correo electrónico</label>
+      <input id="email" type="email" formControlName="email" autocomplete="email" [class.invalid]="errorFor('email')" />
+      @if (errorFor('email'); as error) { <small class="error">{{ error }}</small> }
+    </div>
+
+    <div class="field">
+      <label for="birthDate">Fecha de nacimiento</label>
+      <input id="birthDate" type="date" formControlName="birthDate" [max]="today" [class.invalid]="errorFor('birthDate')" />
+      @if (errorFor('birthDate'); as error) { <small class="error">{{ error }}</small> }
+      @else { <small class="hint">El cliente debe ser mayor de edad.</small> }
+    </div>
+  </div>
+
+  <div class="actions">
+    <a class="btn btn-quiet" routerLink="/clients">Cancelar</a>
+    <button type="submit" class="btn" [disabled]="saving()">
+      {{ saving() ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Registrar cliente' }}
+    </button>
+  </div>
+</form>
