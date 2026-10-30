@@ -4,7 +4,9 @@ import com.bank.application.port.in.CreateClientUseCase;
 import com.bank.application.port.in.DeleteClientUseCase;
 import com.bank.application.port.in.GetClientUseCase;
 import com.bank.application.port.in.UpdateClientUseCase;
+import com.bank.application.port.out.AccountRepositoryPort;
 import com.bank.application.port.out.ClientRepositoryPort;
+import com.bank.domain.exception.ClientHasAccountsException;
 import com.bank.domain.exception.ClientNotFoundException;
 import com.bank.domain.exception.DuplicateIdentificationException;
 import com.bank.domain.model.Client;
@@ -25,10 +27,12 @@ import java.util.List;
 public class ClientService implements CreateClientUseCase, GetClientUseCase, UpdateClientUseCase, DeleteClientUseCase {
 
     private final ClientRepositoryPort clientRepository;
+    private final AccountRepositoryPort accountRepository;
     private final Clock clock;
 
-    public ClientService(ClientRepositoryPort clientRepository, Clock clock) {
+    public ClientService(ClientRepositoryPort clientRepository, AccountRepositoryPort accountRepository, Clock clock) {
         this.clientRepository = clientRepository;
+        this.accountRepository = accountRepository;
         this.clock = clock;
     }
 
@@ -61,6 +65,10 @@ public class ClientService implements CreateClientUseCase, GetClientUseCase, Upd
     @Override
     public void delete(Long id) {
         getById(id);
+        // Regla del PDF. La llave foránea en PostgreSQL también lo impide, pero aquí se responde con un mensaje claro.
+        if (accountRepository.existsByClientId(id)) {
+            throw new ClientHasAccountsException(id);
+        }
         clientRepository.deleteById(id);
     }
 
