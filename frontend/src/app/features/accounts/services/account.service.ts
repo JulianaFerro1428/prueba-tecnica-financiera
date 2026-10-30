@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Account, OpenAccountRequest } from '../models/account.model';
+import { Statement } from '../models/movement.model';
 
 /** Única puerta del frontend hacia /api/accounts. */
 @Injectable({ providedIn: 'root' })
@@ -12,6 +13,10 @@ export class AccountService {
 
   getAll(): Observable<Account[]> {
     return this.http.get<Account[]>(this.baseUrl);
+  }
+
+  getStatement(id: number): Observable<Statement> {
+    return this.http.get<Statement>(`${this.baseUrl}/${id}/statement`);
   }
 
   open(request: OpenAccountRequest): Observable<Account> {

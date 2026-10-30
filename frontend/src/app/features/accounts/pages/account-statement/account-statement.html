@@ -1,0 +1,69 @@
+<a class="back" routerLink="/accounts">← Volver a cuentas</a>
+
+@switch (loadState()) {
+  @case ('loading') {
+    <p class="state" aria-live="polite">Cargando estado de cuenta…</p>
+  }
+  @case ('error') {
+    <div class="state state-error" role="alert">
+      <p>{{ loadError() }}</p>
+      <button type="button" class="btn" (click)="load()">Reintentar</button>
+    </div>
+  }
+  @case ('ready') {
+    @if (account(); as a) {
+      <section class="summary panel" [class]="'summary panel ' + a.type">
+        <div class="identity">
+          <h1 class="figures">{{ a.number }}</h1>
+          <p>
+            <span class="type-badge" [class]="'type-badge ' + a.type">{{ typeLabels[a.type] }}</span>
+            <span class="status" [class]="'status ' + a.status">{{ statusLabels[a.status] }}</span>
+            @if (a.gmfExempt) { <span class="gmf">Exenta GMF</span> }
+          </p>
+          <p class="owner">{{ ownerName() }}</p>
+        </div>
+        <div class="balance">
+          <span class="balance-label">Saldo</span>
+          <strong class="figures">{{ a.balance | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}</strong>
+          <span class="available">
+            Disponible {{ a.availableBalance | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
+          </span>
+        </div>
+      </section>
+
+      <h2>Movimientos</h2>
+      @if (movements().length === 0) {
+        <p class="state">Esta cuenta todavía no tiene movimientos.</p>
+      } @else {
+        <table class="ledger">
+          <thead>
+            <tr>
+              <th scope="col">Fecha</th>
+              <th scope="col">Movimiento</th>
+              <th scope="col" class="amount">Valor</th>
+              <th scope="col" class="amount">Saldo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (movement of movements(); track movement.id) {
+              <tr>
+                <td data-label="Fecha">{{ movement.createdAt | date: 'd MMM y, h:mm a' }}</td>
+                <td data-label="Movimiento">
+                  <span class="description">{{ describe(movement) }}</span>
+                  @if (counterparty(movement); as other) { <small class="other">{{ other }}</small> }
+                </td>
+                <td data-label="Valor" class="figures amount" [class]="'figures amount ' + movement.movementType">
+                  {{ movement.movementType === 'DEBIT' ? '−' : '+' }}
+                  {{ movement.amount | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
+                </td>
+                <td data-label="Saldo" class="figures amount">
+                  {{ movement.balanceAfter | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  }
+}
