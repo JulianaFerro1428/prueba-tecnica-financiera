@@ -24,6 +24,26 @@ El backend usa **arquitectura hexagonal**: las reglas del banco viven en el cent
 | `develop` | Integración de funcionalidades terminadas |
 | `feature/*` | Una rama por funcionalidad (`feature/clients`, `feature/accounts`, `feature/transactions`, ...) |
 
+## Ejecución local
+
+Requisitos: Java 21, Maven 3.9+ y Docker Desktop.
+
+1. Crear el archivo de variables a partir del ejemplo (solo la primera vez):
+   ```bash
+   cp .env.example .env
+   ```
+2. Levantar PostgreSQL (puerto `5433`):
+   ```bash
+   docker compose up -d db
+   ```
+3. Ejecutar el backend (puerto `8081`):
+   ```bash
+   cd backend
+   mvn spring-boot:run
+   ```
+
+Al arrancar, Flyway aplica los scripts de `backend/src/main/resources/db/migration` para crear o actualizar las tablas.
+
 ## Estado
 
-En construcción. Las instrucciones para ejecutar el proyecto se agregarán a medida que avancen las etapas.
+En construcción. Las instrucciones se completarán a medida que avancen las etapas.

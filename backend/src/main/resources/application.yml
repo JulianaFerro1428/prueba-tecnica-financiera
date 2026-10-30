@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: bank-backend
+
+  # Los valores por defecto son solo para desarrollo local (coinciden con .env.example).
+  # En Docker u otro entorno se reemplazan con variables de entorno.
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/bank}
+    username: ${DB_USERNAME:bank_user}
+    password: ${DB_PASSWORD:bank_dev_password}
+
+  jpa:
+    hibernate:
+      # Flyway crea las tablas; Hibernate solo comprueba que las entidades coincidan con ellas.
+      ddl-auto: validate
+    # Evita consultas a la base de datos fuera de los casos de uso (por ejemplo, al armar el JSON).
+    open-in-view: false
+
+  flyway:
+    locations: classpath:db/migration
+
+server:
+  port: ${SERVER_PORT:8081}
