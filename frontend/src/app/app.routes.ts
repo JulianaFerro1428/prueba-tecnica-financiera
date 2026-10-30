@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 
+const clientForm = () => import('./features/clients/pages/client-form/client-form').then((m) => m.ClientForm);
+
 // Carga diferida: el código de cada pantalla se descarga solo cuando se visita.
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'clients' },
@@ -8,4 +10,6 @@ export const routes: Routes = [
     title: 'Clientes · Ventanilla',
     loadComponent: () => import('./features/clients/pages/client-list/client-list').then((m) => m.ClientList),
   },
+  { path: 'clients/new', title: 'Registrar cliente · Ventanilla', loadComponent: clientForm },
+  { path: 'clients/:id/edit', title: 'Editar cliente · Ventanilla', loadComponent: clientForm },
 ];
