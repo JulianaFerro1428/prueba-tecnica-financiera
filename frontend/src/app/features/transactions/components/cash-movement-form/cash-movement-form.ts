@@ -1,19 +1,14 @@
 import { formatCurrency } from '@angular/common';
 import { Component, LOCALE_ID, inject, input, output, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 
 import { apiErrorMessage } from '../../../../core/http/api-error';
 import { Movement } from '../../../accounts/models/movement.model';
 import { TransactionService } from '../../services/transaction.service';
+import { AMOUNT_VALIDATORS, amountErrorMessage } from '../../validators/amount';
 
 type CashKind = 'DEPOSIT' | 'WITHDRAWAL';
-
-/** Igual que el backend (@Digits fraction = 2): pesos con máximo dos decimales. */
-function maxTwoDecimals(control: AbstractControl<number | null>): ValidationErrors | null {
-  const value = control.value;
-  return value === null || /^\d+(\.\d{1,2})?$/.test(String(value)) ? null : { decimals: true };
-}
 
 /**
  * Formulario para consignar o retirar en una cuenta. No sabe nada del estado de cuenta:
@@ -35,21 +30,14 @@ export class CashMovementForm {
 
   protected readonly form = this.fb.group({
     kind: this.fb.nonNullable.control<CashKind>('DEPOSIT'),
-    amount: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01), maxTwoDecimals]),
+    amount: this.fb.control<number | null>(null, AMOUNT_VALIDATORS),
   });
   protected readonly saving = signal(false);
   protected readonly success = signal('');
   protected readonly serverError = signal('');
 
   protected amountError(): string | null {
-    const amount = this.form.controls.amount;
-    if (!amount.touched || amount.valid) {
-      return null;
-    }
-    if (amount.hasError('required')) {
-      return 'Escribe el monto';
-    }
-    return amount.hasError('decimals') ? 'El monto admite máximo 2 decimales' : 'El monto debe ser mayor que $ 0';
+    return amountErrorMessage(this.form.controls.amount);
   }
 
   protected submit(): void {
