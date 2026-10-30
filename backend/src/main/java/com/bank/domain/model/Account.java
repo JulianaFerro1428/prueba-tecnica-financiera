@@ -1,11 +1,15 @@
 package com.bank.domain.model;
 
 import com.bank.domain.exception.AccountBalanceNotZeroException;
+import com.bank.domain.exception.AccountNotActiveException;
 import com.bank.domain.exception.CancelledAccountException;
+import com.bank.domain.exception.InsufficientFundsException;
+import com.bank.domain.exception.InvalidAmountException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Producto financiero (cuenta de ahorros o corriente). Es Java puro y protege sus reglas:
@@ -75,6 +79,64 @@ public class Account {
             throw new AccountBalanceNotZeroException(number, balance);
         }
         changeStatus(AccountStatus.CANCELLED, now);
+    }
+
+    /** Consignación: entra dinero a la cuenta. */
+    public Movement deposit(BigDecimal amount, UUID reference, LocalDateTime now) {
+        return credit(TransactionType.DEPOSIT, amount, null, reference, now);
+    }
+
+    /** Retiro: sale dinero de la cuenta. */
+    public Movement withdraw(BigDecimal amount, UUID reference, LocalDateTime now) {
+        return debit(TransactionType.WITHDRAWAL, amount, null, reference, now);
+    }
+
+    /** Lado que envía una transferencia: genera el débito. */
+    public Movement sendTransfer(BigDecimal amount, Long targetAccountId, UUID reference, LocalDateTime now) {
+        return debit(TransactionType.TRANSFER, amount, targetAccountId, reference, now);
+    }
+
+    /** Lado que recibe una transferencia: genera el crédito. */
+    public Movement receiveTransfer(BigDecimal amount, Long sourceAccountId, UUID reference, LocalDateTime now) {
+        return credit(TransactionType.TRANSFER, amount, sourceAccountId, reference, now);
+    }
+
+    // Cada cambio de saldo devuelve su movimiento: así el saldo nunca cambia sin dejar rastro.
+    private Movement credit(TransactionType type, BigDecimal amount, Long counterpartyAccountId,
+                            UUID reference, LocalDateTime now) {
+        ensureCanMoveMoney(amount);
+        applyNewBalance(balance.add(amount), now);
+        return new Movement(null, reference, id, type, MovementType.CREDIT, amount, balance,
+                counterpartyAccountId, now);
+    }
+
+    private Movement debit(TransactionType type, BigDecimal amount, Long counterpartyAccountId,
+                           UUID reference, LocalDateTime now) {
+        ensureCanMoveMoney(amount);
+        BigDecimal newBalance = balance.subtract(amount);
+        // El PDF lo exige para ahorros; por decisión del proyecto (sin sobregiro definido) aplica a ambos tipos.
+        if (newBalance.signum() < 0) {
+            throw new InsufficientFundsException(number, balance, amount);
+        }
+        applyNewBalance(newBalance, now);
+        return new Movement(null, reference, id, type, MovementType.DEBIT, amount, balance,
+                counterpartyAccountId, now);
+    }
+
+    /** Decisión del proyecto: solo las cuentas activas mueven dinero; inactivas y canceladas no. */
+    private void ensureCanMoveMoney(BigDecimal amount) {
+        if (amount == null || amount.signum() <= 0 || amount.stripTrailingZeros().scale() > 2) {
+            throw new InvalidAmountException();
+        }
+        if (status != AccountStatus.ACTIVE) {
+            throw new AccountNotActiveException(number, status);
+        }
+    }
+
+    private void applyNewBalance(BigDecimal newBalance, LocalDateTime now) {
+        this.balance = newBalance;
+        this.availableBalance = newBalance;
+        this.updatedAt = now;
     }
 
     private void changeStatus(AccountStatus newStatus, LocalDateTime now) {
