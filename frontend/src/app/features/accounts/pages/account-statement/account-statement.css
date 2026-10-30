@@ -89,3 +89,12 @@ h2 {
     justify-items: start;
   }
 }
+
+.movement-form {
+  display: block;
+  margin-top: var(--space-6);
+}
+
+.inactive-hint {
+  margin-top: var(--space-6);
+}

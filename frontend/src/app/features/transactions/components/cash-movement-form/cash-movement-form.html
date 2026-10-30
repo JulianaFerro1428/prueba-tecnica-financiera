@@ -1,0 +1,40 @@
+<form class="panel" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <fieldset class="kind">
+    <legend class="visually-hidden">Tipo de movimiento</legend>
+    <label class="kind-option">
+      <input type="radio" formControlName="kind" value="DEPOSIT" />
+      Consignar
+    </label>
+    <label class="kind-option">
+      <input type="radio" formControlName="kind" value="WITHDRAWAL" />
+      Retirar
+    </label>
+  </fieldset>
+
+  <div class="field">
+    <label for="amount">Monto</label>
+    <div class="amount-input" [class.invalid]="amountError()">
+      <span aria-hidden="true">$</span>
+      <input id="amount" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="50000"
+             formControlName="amount" [attr.aria-describedby]="amountError() ? 'amount-error' : null" />
+    </div>
+    @if (amountError(); as message) {
+      <small id="amount-error" class="error">{{ message }}</small>
+    }
+  </div>
+
+  <button type="submit" class="btn" [disabled]="saving()">
+    @if (saving()) {
+      Guardando…
+    } @else {
+      {{ form.controls.kind.value === 'DEPOSIT' ? 'Consignar' : 'Retirar' }}
+    }
+  </button>
+
+  @if (success()) {
+    <p class="form-success" role="status">{{ success() }}</p>
+  }
+  @if (serverError()) {
+    <p class="form-error" role="alert">{{ serverError() }}</p>
+  }
+</form>

@@ -31,6 +31,12 @@
         </div>
       </section>
 
+      @if (a.status === 'ACTIVE') {
+        <app-cash-movement-form class="movement-form" [accountId]="a.id" (completed)="load()" />
+      } @else {
+        <p class="state inactive-hint">Activa la cuenta para consignar o retirar dinero.</p>
+      }
+
       <h2>Movimientos</h2>
       @if (movements().length === 0) {
         <p class="state">Esta cuenta todavía no tiene movimientos.</p>

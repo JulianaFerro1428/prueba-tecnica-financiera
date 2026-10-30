@@ -4,10 +4,12 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import localeEsCo from '@angular/common/locales/es-CO';
 import { LOCALE_ID } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 
 import { Account } from '../../models/account.model';
 import { Movement } from '../../models/movement.model';
+import { CashMovementForm } from '../../../transactions/components/cash-movement-form/cash-movement-form';
 import { AccountStatement } from './account-statement';
 
 const ACCOUNT: Account = {
@@ -43,15 +45,23 @@ describe('AccountStatement', () => {
 
   afterEach(() => http.verify());
 
-  function render(movements: Movement[]) {
+  function renderFixture(movements: Movement[], account: Account = ACCOUNT) {
     configure('1');
     const fixture = TestBed.createComponent(AccountStatement);
     fixture.detectChanges();
-    http.expectOne('/api/accounts/1/statement').flush({ account: ACCOUNT, movements });
-    http.expectOne('/api/accounts').flush([ACCOUNT, OTHER]);
-    http.expectOne('/api/clients').flush([MARIA]);
+    flushLoad(movements, account);
     fixture.detectChanges();
-    return fixture.nativeElement as HTMLElement;
+    return fixture;
+  }
+
+  function flushLoad(movements: Movement[], account: Account) {
+    http.expectOne('/api/accounts/1/statement').flush({ account, movements });
+    http.expectOne('/api/accounts').flush([account, OTHER]);
+    http.expectOne('/api/clients').flush([MARIA]);
+  }
+
+  function render(movements: Movement[]) {
+    return renderFixture(movements).nativeElement as HTMLElement;
   }
 
   it('muestra la cuenta, su dueño y el saldo', () => {
@@ -104,5 +114,27 @@ describe('AccountStatement', () => {
     fixture.detectChanges();
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('No existe una cuenta con id 99');
+  });
+
+  it('solo ofrece consignar o retirar si la cuenta está activa', () => {
+    const fixture = renderFixture([], { ...ACCOUNT, status: 'INACTIVE' });
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(fixture.debugElement.query(By.directive(CashMovementForm))).toBeNull();
+    expect(element.textContent).toContain('Activa la cuenta para consignar o retirar dinero.');
+  });
+
+  it('después de un movimiento vuelve a cargar el estado de cuenta', () => {
+    const fixture = renderFixture([]);
+    const deposit = movement({ id: 3, amount: 50000, balanceAfter: 120000 });
+
+    const form = fixture.debugElement.query(By.directive(CashMovementForm)).componentInstance as CashMovementForm;
+    form.completed.emit(deposit);
+    flushLoad([deposit], { ...ACCOUNT, balance: 120000, availableBalance: 120000 });
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(element.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(element.textContent).toContain('120.000');
   });
 });

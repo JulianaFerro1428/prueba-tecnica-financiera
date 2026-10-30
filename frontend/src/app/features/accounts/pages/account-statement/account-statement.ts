@@ -5,6 +5,7 @@ import { forkJoin } from 'rxjs';
 
 import { apiErrorMessage } from '../../../../core/http/api-error';
 import { ClientService } from '../../../clients/services/client.service';
+import { CashMovementForm } from '../../../transactions/components/cash-movement-form/cash-movement-form';
 import { ACCOUNT_STATUS_LABELS, ACCOUNT_TYPE_LABELS, Account } from '../../models/account.model';
 import { Movement } from '../../models/movement.model';
 import { AccountService } from '../../services/account.service';
@@ -14,7 +15,7 @@ type LoadState = 'loading' | 'ready' | 'error';
 /** Estado de cuenta (/accounts/:id): saldo actual y movimientos, del más reciente al más antiguo. */
 @Component({
   selector: 'app-account-statement',
-  imports: [CurrencyPipe, DatePipe, RouterLink],
+  imports: [CashMovementForm, CurrencyPipe, DatePipe, RouterLink],
   templateUrl: './account-statement.html',
   styleUrl: './account-statement.css',
 })
@@ -39,7 +40,10 @@ export class AccountStatement {
   }
 
   protected load(): void {
-    this.loadState.set('loading');
+    // Al recargar después de un movimiento no se oculta la pantalla: solo se actualizan los datos.
+    if (!this.account()) {
+      this.loadState.set('loading');
+    }
     forkJoin({
       statement: this.accountService.getStatement(this.accountId),
       accounts: this.accountService.getAll(),
