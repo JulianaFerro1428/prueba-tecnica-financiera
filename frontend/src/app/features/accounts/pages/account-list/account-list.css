@@ -1,0 +1,48 @@
+.amount {
+  text-align: right;
+}
+
+.type-badge,
+.status {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+}
+
+.type-badge.SAVINGS {
+  background: var(--color-savings-soft);
+  color: #2f7d66;
+}
+
+.type-badge.CHECKING {
+  background: var(--color-checking-soft);
+  color: #4d5cc4;
+}
+
+.gmf {
+  margin-left: var(--space-2);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.status.ACTIVE {
+  background: var(--color-savings-soft);
+  color: var(--color-success);
+}
+
+.status.INACTIVE {
+  background: var(--color-warning-soft);
+  color: #b86e1f;
+}
+
+.status.CANCELLED {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.no-actions {
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
