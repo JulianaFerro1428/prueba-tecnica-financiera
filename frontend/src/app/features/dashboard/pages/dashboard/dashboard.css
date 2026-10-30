@@ -1,0 +1,316 @@
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.page-header .btn {
+  white-space: nowrap;
+}
+
+.date {
+  margin: 0 0 0.25rem;
+  color: var(--color-muted);
+}
+
+.date::first-letter {
+  text-transform: uppercase;
+}
+
+.loading,
+.empty {
+  color: var(--color-muted);
+}
+
+.state-error {
+  color: var(--color-danger);
+}
+
+/* Banda de dinero: la pieza protagonista del panel. */
+.money-band {
+  margin-bottom: var(--space-6);
+  background: linear-gradient(120deg, var(--color-savings-soft), var(--color-surface) 45%, var(--color-checking-soft));
+}
+
+.total {
+  margin: 0.25rem 0 var(--space-4);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.band {
+  display: flex;
+  gap: 4px;
+  height: 22px;
+}
+
+.band-part {
+  min-width: 6px;
+  border-radius: 999px;
+  transition: opacity 0.2s, transform 0.2s;
+  animation: grow 0.8s ease-out;
+  transform-origin: left;
+}
+
+.band-part:hover {
+  transform: scaleY(1.25);
+}
+
+.band-part.savings {
+  background: var(--color-savings);
+}
+
+.band-part.checking {
+  flex: 1;
+  background: var(--color-checking);
+}
+
+.band-part.empty {
+  flex: 1;
+  background: var(--color-border);
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.band-legend,
+.status-legend,
+.top-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.band-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-8);
+  margin-top: var(--space-4);
+}
+
+.band-legend li,
+.status-legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: opacity 0.2s;
+}
+
+.share {
+  color: var(--color-muted);
+}
+
+.dimmed {
+  opacity: 0.35;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot.savings {
+  background: var(--color-savings);
+}
+
+.dot.checking {
+  background: var(--color-checking);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 2fr;
+  gap: var(--space-6);
+}
+
+/* Dona de cuentas por estado. */
+.donut-wrap {
+  position: relative;
+  width: 180px;
+  margin: var(--space-4) auto;
+}
+
+.donut {
+  display: block;
+  transform: rotate(-90deg);
+}
+
+.donut-track,
+.donut-arc {
+  fill: none;
+  stroke-width: 18;
+}
+
+.donut-track {
+  stroke: var(--color-bg);
+}
+
+.donut-arc {
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+
+.donut-arc.ACTIVE,
+.dot.ACTIVE {
+  stroke: var(--color-savings);
+  background: var(--color-savings);
+}
+
+.donut-arc.INACTIVE,
+.dot.INACTIVE {
+  stroke: var(--color-warning);
+  background: var(--color-warning);
+}
+
+.donut-arc.CANCELLED,
+.dot.CANCELLED {
+  stroke: var(--color-danger);
+  background: var(--color-danger);
+}
+
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+}
+
+.donut-center strong {
+  font-size: 2rem;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.status-legend {
+  display: grid;
+  gap: 0.375rem;
+}
+
+.status-legend strong {
+  margin-left: auto;
+}
+
+.clients-note {
+  margin: var(--space-4) 0 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+}
+
+.clients-note strong {
+  color: var(--color-text);
+}
+
+/* Lista de cuentas con más saldo y sus filtros. */
+.panel-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.chips {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.chip {
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.chip.selected {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.top-list li {
+  display: grid;
+  grid-template-columns: 96px 1fr auto auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0.75rem 0.5rem;
+  border-radius: var(--radius);
+}
+
+.top-list li:hover {
+  background: var(--color-bg);
+}
+
+.type-badge,
+.status {
+  justify-self: start;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+}
+
+.type-badge.SAVINGS {
+  background: var(--color-savings-soft);
+  color: #2f7d66;
+}
+
+.type-badge.CHECKING {
+  background: var(--color-checking-soft);
+  color: #4d5cc4;
+}
+
+.status.ACTIVE {
+  color: var(--color-success);
+}
+
+.status.INACTIVE {
+  color: #b86e1f;
+  background: var(--color-warning-soft);
+}
+
+.status.CANCELLED {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.amount {
+  text-align: right;
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-list li {
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem var(--space-4);
+  }
+
+  .amount {
+    text-align: left;
+  }
+}

@@ -1,10 +1,22 @@
-<header class="topbar">
-  <a class="brand" routerLink="/">Ventanilla</a>
-  <nav aria-label="Secciones">
-    <a routerLink="/clients" routerLinkActive="active">Clientes</a>
-  </nav>
-</header>
+<div class="layout">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/">
+      <span class="brand-mark" aria-hidden="true">V</span>
+      Ventanilla
+    </a>
+    <nav aria-label="Secciones">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4zm0 7h6v-5H4zm10 0h6v-9h-6zm0-16v5h6V4z" /></svg>
+        Inicio
+      </a>
+      <a routerLink="/clients" routerLinkActive="active">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8m0 2c-3.3 0-8 1.7-8 5v1h16v-1c0-3.3-4.7-5-8-5" /></svg>
+        Clientes
+      </a>
+    </nav>
+  </aside>
 
-<main class="content">
-  <router-outlet />
-</main>
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

@@ -1,11 +1,16 @@
 import { Routes } from '@angular/router';
 
+// Carga diferida: el código de cada pantalla se descarga solo cuando se visita.
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'clients' },
+  {
+    path: '',
+    pathMatch: 'full',
+    title: 'Inicio · Ventanilla',
+    loadComponent: () => import('./features/dashboard/pages/dashboard/dashboard').then((m) => m.Dashboard),
+  },
   {
     path: 'clients',
     title: 'Clientes · Ventanilla',
-    // Carga diferida: el código de la pantalla se descarga solo cuando se visita.
     loadComponent: () => import('./features/clients/pages/client-list/client-list').then((m) => m.ClientList),
   },
 ];
