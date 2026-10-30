@@ -9,8 +9,10 @@ import com.bank.application.port.out.AccountRepositoryPort;
 import com.bank.application.port.out.ClientRepositoryPort;
 import com.bank.domain.exception.AccountNotFoundException;
 import com.bank.domain.exception.ClientNotFoundException;
+import com.bank.domain.exception.DuplicateAccountTypeException;
 import com.bank.domain.model.Account;
 import com.bank.domain.model.AccountNumber;
+import com.bank.domain.model.AccountType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,7 @@ public class AccountService implements OpenAccountUseCase, GetAccountUseCase, Ch
     public Account open(OpenAccountCommand command) {
         // El cliente se valida antes de pedir el consecutivo, para no gastar números en cuentas que no se abren.
         ensureClientExists(command.clientId());
+        ensureNoOpenAccountOfType(command.clientId(), command.type());
         AccountNumber number = AccountNumber.generate(command.type(), numberSequence.nextSequence(command.type()));
         Account account = Account.open(command.type(), number, command.clientId(), command.gmfExempt(), now());
         return accountRepository.save(account);
@@ -91,6 +94,19 @@ public class AccountService implements OpenAccountUseCase, GetAccountUseCase, Ch
         if (clientRepository.findById(clientId).isEmpty()) {
             throw new ClientNotFoundException(clientId);
         }
+    }
+
+    /**
+     * Decisión del proyecto (el PDF no fija un límite): una cuenta de cada tipo por cliente.
+     * Las inactivas cuentan porque se pueden reactivar; las canceladas no, porque quedan cerradas para siempre.
+     */
+    private void ensureNoOpenAccountOfType(Long clientId, AccountType type) {
+        accountRepository.findByClientId(clientId).stream()
+                .filter(account -> account.getType() == type && !account.isCancelled())
+                .findFirst()
+                .ifPresent(existing -> {
+                    throw new DuplicateAccountTypeException(type, existing.getNumber());
+                });
     }
 
     private LocalDateTime now() {

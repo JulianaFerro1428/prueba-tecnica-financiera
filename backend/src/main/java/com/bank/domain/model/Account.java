@@ -152,6 +152,10 @@ public class Account {
         }
     }
 
+    public boolean isCancelled() {
+        return status == AccountStatus.CANCELLED;
+    }
+
     public Long getId() {
         return id;
     }

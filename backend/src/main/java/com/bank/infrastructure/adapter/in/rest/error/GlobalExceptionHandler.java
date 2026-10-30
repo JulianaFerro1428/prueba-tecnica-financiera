@@ -1,6 +1,7 @@
 package com.bank.infrastructure.adapter.in.rest.error;
 
 import com.bank.domain.exception.DomainException;
+import com.bank.domain.exception.DuplicateAccountTypeException;
 import com.bank.domain.exception.DuplicateIdentificationException;
 import com.bank.domain.exception.NotFoundException;
 import org.slf4j.Logger;
@@ -36,8 +37,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(DuplicateIdentificationException.class)
-    public ProblemDetail handleDuplicate(DuplicateIdentificationException ex) {
+    /** Ya existe algo que no se puede repetir: un documento de cliente o una cuenta de ese tipo. */
+    @ExceptionHandler({DuplicateIdentificationException.class, DuplicateAccountTypeException.class})
+    public ProblemDetail handleDuplicate(DomainException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 
