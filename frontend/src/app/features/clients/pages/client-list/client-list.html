@@ -1,0 +1,61 @@
+<section>
+  <header class="page-header">
+    <h1>Clientes</h1>
+    <a class="btn" routerLink="/clients/new">Registrar cliente</a>
+  </header>
+
+  @if (notice(); as n) {
+    <p class="notice" [class.notice-error]="n.kind === 'error'" role="alert">{{ n.text }}</p>
+  }
+
+  @switch (loadState()) {
+    @case ('loading') {
+      <p class="state" aria-live="polite">Cargando clientes…</p>
+    }
+    @case ('error') {
+      <div class="state state-error" role="alert">
+        <p>{{ loadError() }}</p>
+        <button type="button" class="btn" (click)="load()">Reintentar</button>
+      </div>
+    }
+    @case ('ready') {
+      @if (clients().length === 0) {
+        <p class="state">Todavía no hay clientes registrados.</p>
+      } @else {
+        <table class="ledger">
+          <thead>
+            <tr>
+              <th scope="col">Identificación</th>
+              <th scope="col">Nombre</th>
+              <th scope="col">Correo</th>
+              <th scope="col">Nacimiento</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (client of clients(); track client.id) {
+              <tr>
+                <td data-label="Identificación" class="figures">
+                  <span><span class="id-type">{{ client.identificationType }}</span> {{ client.identificationNumber }}</span>
+                </td>
+                <td data-label="Nombre">{{ client.firstNames }} {{ client.lastName }}</td>
+                <td data-label="Correo">{{ client.email }}</td>
+                <td data-label="Nacimiento" class="figures">{{ client.birthDate | date: 'dd/MM/yyyy' }}</td>
+                <td class="actions">
+                  @if (confirmingId() === client.id) {
+                    <span class="confirm-text">¿Eliminar a {{ client.firstNames }}?</span>
+                    <button type="button" class="btn btn-danger" (click)="delete(client)">Sí, eliminar</button>
+                    <button type="button" class="btn btn-quiet" (click)="cancelDelete()">No</button>
+                  } @else {
+                    <a class="btn btn-quiet" [routerLink]="['/clients', client.id, 'edit']">Editar</a>
+                    <button type="button" class="btn btn-quiet" (click)="askToDelete(client)">Eliminar</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  }
+</section>

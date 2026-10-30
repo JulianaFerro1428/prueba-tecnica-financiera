@@ -1,0 +1,81 @@
+<section>
+  <header class="page-header">
+    <h1>Cuentas</h1>
+    <a class="btn" routerLink="/accounts/new">Abrir cuenta</a>
+  </header>
+
+  @if (notice(); as n) {
+    <p class="notice" [class.notice-error]="n.kind === 'error'" role="alert">{{ n.text }}</p>
+  }
+
+  @switch (loadState()) {
+    @case ('loading') {
+      <p class="state" aria-live="polite">Cargando cuentas…</p>
+    }
+    @case ('error') {
+      <div class="state state-error" role="alert">
+        <p>{{ loadError() }}</p>
+        <button type="button" class="btn" (click)="load()">Reintentar</button>
+      </div>
+    }
+    @case ('ready') {
+      @if (accounts().length === 0) {
+        <p class="state">Todavía no hay cuentas abiertas.</p>
+      } @else {
+        <table class="ledger">
+          <thead>
+            <tr>
+              <th scope="col">Número</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Cliente</th>
+              <th scope="col" class="amount">Saldo</th>
+              <th scope="col">Estado</th>
+              <th scope="col"><span class="visually-hidden">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (account of accounts(); track account.id) {
+              <tr>
+                <td data-label="Número" class="figures">
+                  <a [routerLink]="['/accounts', account.id]" [attr.aria-label]="'Ver estado de cuenta ' + account.number">{{ account.number }}</a>
+                </td>
+                <td data-label="Tipo">
+                  <span class="type-badge" [class]="'type-badge ' + account.type">{{ typeLabels[account.type] }}</span>
+                  @if (account.gmfExempt) { <span class="gmf">Exenta GMF</span> }
+                </td>
+                <td data-label="Cliente">{{ ownerNames()[account.clientId] ?? 'Cliente ' + account.clientId }}</td>
+                <td data-label="Saldo" class="figures amount">
+                  {{ account.balance | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
+                </td>
+                <td data-label="Estado">
+                  <span class="status" [class]="'status ' + account.status">{{ statusLabels[account.status] }}</span>
+                </td>
+                <td class="actions">
+                  @if (confirmingCancelId() === account.id) {
+                    <span class="confirm-text">¿Cancelar? Es definitivo.</span>
+                    <button type="button" class="btn btn-danger" (click)="cancel(account)">Sí, cancelar</button>
+                    <button type="button" class="btn btn-quiet" (click)="keepAccount()">No</button>
+                  } @else {
+                    @switch (account.status) {
+                      @case ('ACTIVE') {
+                        <button type="button" class="btn btn-quiet" (click)="deactivate(account)">Inactivar</button>
+                      }
+                      @case ('INACTIVE') {
+                        <button type="button" class="btn btn-quiet" (click)="activate(account)">Activar</button>
+                      }
+                    }
+                    @if (account.status !== 'CANCELLED') {
+                      <button type="button" class="btn btn-quiet" (click)="askToCancel(account)">Cancelar</button>
+                    } @else {
+                      <span class="no-actions">Sin acciones</span>
+                    }
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+  }
+</section>

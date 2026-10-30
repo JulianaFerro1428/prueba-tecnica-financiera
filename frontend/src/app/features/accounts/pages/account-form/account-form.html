@@ -1,0 +1,63 @@
+<a class="back" routerLink="/accounts">← Volver a cuentas</a>
+<h1>Abrir cuenta</h1>
+
+@if (clients(); as clientList) {
+  @if (clientList.length === 0) {
+    <div class="panel empty">
+      <p>Primero registra un cliente: toda cuenta debe pertenecer a uno.</p>
+      <a class="btn" routerLink="/clients/new">Registrar cliente</a>
+    </div>
+  } @else {
+    <form class="panel" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      @if (formError()) {
+        <p class="form-error" role="alert">{{ formError() }}</p>
+      }
+
+      <div class="field">
+        <label for="clientId">Cliente</label>
+        <select id="clientId" formControlName="clientId" [class.invalid]="showError('clientId')">
+          <option value="" disabled>Selecciona un cliente</option>
+          @for (client of clientList; track client.id) {
+            <option [value]="client.id">
+              {{ client.firstNames }} {{ client.lastName }} · {{ client.identificationType }} {{ client.identificationNumber }}
+            </option>
+          }
+        </select>
+        @if (showError('clientId')) { <small class="error">Selecciona el cliente dueño de la cuenta</small> }
+      </div>
+
+      <fieldset class="field">
+        <legend>Tipo de cuenta</legend>
+        <div class="type-options">
+          <label class="type-option savings">
+            <input type="radio" formControlName="type" value="SAVINGS" />
+            <strong>{{ typeLabels.SAVINGS }}</strong>
+            <small>El número empieza por 53 y la cuenta nace activa.</small>
+          </label>
+          <label class="type-option checking">
+            <input type="radio" formControlName="type" value="CHECKING" />
+            <strong>{{ typeLabels.CHECKING }}</strong>
+            <small>El número empieza por 33 y la cuenta nace activa.</small>
+          </label>
+        </div>
+        @if (showError('type')) { <small class="error">Selecciona el tipo de cuenta</small> }
+      </fieldset>
+
+      <label class="check">
+        <input type="checkbox" formControlName="gmfExempt" />
+        Exenta de GMF
+      </label>
+
+      <p class="hint">El número de cuenta lo genera el sistema y el saldo inicial es $ 0.</p>
+
+      <div class="actions">
+        <a class="btn btn-quiet" routerLink="/accounts">Cancelar</a>
+        <button type="submit" class="btn" [disabled]="saving()">{{ saving() ? 'Abriendo…' : 'Abrir cuenta' }}</button>
+      </div>
+    </form>
+  }
+} @else if (formError()) {
+  <p class="form-error" role="alert">{{ formError() }}</p>
+} @else {
+  <p class="state" aria-live="polite">Cargando clientes…</p>
+}

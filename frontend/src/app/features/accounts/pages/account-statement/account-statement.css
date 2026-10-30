@@ -1,0 +1,100 @@
+.back {
+  display: inline-block;
+  margin-bottom: var(--space-4);
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.back:hover {
+  color: var(--color-primary);
+}
+
+/* Cabecera: quién es la cuenta a la izquierda y cuánto tiene a la derecha. */
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-6);
+  border-left: 6px solid var(--color-checking);
+}
+
+.summary.SAVINGS {
+  border-left-color: var(--color-savings);
+}
+
+.identity h1 {
+  margin: 0 0 var(--space-2);
+  letter-spacing: 0.04em;
+}
+
+.identity p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.identity .gmf {
+  margin-left: 0;
+}
+
+.identity .owner {
+  margin-top: var(--space-2);
+  color: var(--color-muted);
+}
+
+.balance {
+  display: grid;
+  justify-items: end;
+  gap: 0.125rem;
+}
+
+.balance-label,
+.available {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.balance strong {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+h2 {
+  margin: var(--space-8) 0 var(--space-4);
+  font-size: 1.125rem;
+}
+
+.description {
+  display: block;
+  font-weight: 500;
+}
+
+.other {
+  color: var(--color-muted);
+}
+
+.amount.CREDIT {
+  color: var(--color-success);
+}
+
+.amount.DEBIT {
+  color: var(--color-danger);
+}
+
+@media (max-width: 720px) {
+  .balance {
+    justify-items: start;
+  }
+}
+
+.movement-form {
+  display: block;
+  margin-top: var(--space-6);
+}
+
+.inactive-hint {
+  margin-top: var(--space-6);
+}

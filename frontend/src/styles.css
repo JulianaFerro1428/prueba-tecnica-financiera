@@ -1,0 +1,334 @@
+/* Variables de diseño compartidas por todas las pantallas. */
+:root {
+  --color-bg: #f3f5fb;
+  --color-surface: #ffffff;
+  --color-sidebar: #eef0fb;
+  --color-text: #1f2a44;
+  --color-muted: #6b7590;
+  --color-border: #e3e7f2;
+  --color-primary: #5b6ee8;
+  --color-primary-hover: #4a5cd6;
+  --color-primary-soft: #e6e9ff;
+  --color-savings: #5fb49c;
+  --color-savings-soft: #e3f4ee;
+  --color-checking: #8c9bf2;
+  --color-checking-soft: #eceefe;
+  --color-warning: #f2a65a;
+  --color-warning-soft: #fdf0e3;
+  --color-danger: #d9534f;
+  --color-danger-soft: #fbe9e8;
+  --color-success: #3f9b7f;
+  --space-2: 0.5rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --radius: 10px;
+  --radius-lg: 18px;
+  --shadow: 0 1px 2px rgba(31, 42, 68, 0.04), 0 8px 24px rgba(31, 42, 68, 0.06);
+  font-family: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+/* Cifras del mismo ancho: identificaciones, fechas y saldos quedan alineados en columna. */
+.figures {
+  font-variant-numeric: tabular-nums;
+}
+
+.panel {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: var(--space-6);
+}
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn-quiet {
+  background: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-border);
+}
+
+.btn-quiet:hover {
+  background: var(--color-primary-soft);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-danger:hover {
+  background: #c2413d;
+}
+
+:focus-visible {
+  outline: 3px solid #aab6ff;
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Listas: encabezado de página, avisos, estados y tabla compartidos por todas las pantallas. */
+.page-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.state {
+  padding: var(--space-6) 0;
+  color: var(--color-muted);
+}
+
+.state-error {
+  color: var(--color-danger);
+}
+
+.notice {
+  margin: 0 0 var(--space-4);
+  padding: 0.75rem var(--space-4);
+  border-radius: var(--radius);
+  background: var(--color-savings-soft);
+  color: #2f7d66;
+}
+
+.notice-error {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.ledger th {
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-muted);
+  padding: 0.875rem var(--space-4);
+  background: var(--color-sidebar);
+}
+
+.ledger td {
+  padding: 0.875rem var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.ledger tbody tr:hover {
+  background: var(--color-bg);
+}
+
+.ledger tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ledger td.figures {
+  white-space: nowrap;
+}
+
+/* Si no caben, los botones bajan de línea en vez de ensanchar la tabla. */
+.actions {
+  text-align: right;
+}
+
+.actions .btn {
+  margin: 0.125rem 0 0.125rem var(--space-2);
+}
+
+.confirm-text {
+  margin-right: var(--space-2);
+  color: var(--color-danger);
+}
+
+/* Campo de monto con el signo $ delante: consignar, retirar y transferir. */
+.amount-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.amount-input:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.amount-input.invalid {
+  border-color: var(--color-danger);
+}
+
+.amount-input span {
+  color: var(--color-muted);
+}
+
+.amount-input input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.625rem 0;
+  border: none;
+  outline: none;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+}
+
+/* Resultado de una operación dentro de un formulario. */
+.form-success,
+.form-error {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 0.75rem var(--space-4);
+  border-radius: var(--radius);
+}
+
+.form-success {
+  background: var(--color-savings-soft);
+  color: #2f7d66;
+}
+
+.form-error {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+/* Insignias de cuenta: se usan en la lista de cuentas y en el estado de cuenta. */
+.ledger .amount {
+  text-align: right;
+}
+
+.type-badge,
+.status {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+}
+
+.type-badge.SAVINGS {
+  background: var(--color-savings-soft);
+  color: #2f7d66;
+}
+
+.type-badge.CHECKING {
+  background: var(--color-checking-soft);
+  color: #4d5cc4;
+}
+
+.gmf {
+  margin-left: var(--space-2);
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.status.ACTIVE {
+  background: var(--color-savings-soft);
+  color: var(--color-success);
+}
+
+.status.INACTIVE {
+  background: var(--color-warning-soft);
+  color: #b86e1f;
+}
+
+.status.CANCELLED {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+/* En pantallas angostas cada cliente se apila y cada dato muestra su etiqueta. */
+@media (max-width: 720px) {
+  .ledger thead {
+    display: none;
+  }
+
+  .ledger tr {
+    display: block;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .ledger td {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    border: none;
+    padding: 0.25rem var(--space-4);
+  }
+
+  .ledger td[data-label]::before {
+    content: attr(data-label);
+    color: var(--color-muted);
+  }
+
+  .ledger td.actions {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+}
