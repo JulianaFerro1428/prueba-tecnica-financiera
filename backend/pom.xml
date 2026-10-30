@@ -13,7 +13,7 @@
 
     <groupId>com.bank</groupId>
     <artifactId>bank-backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0</version>
     <name>bank-backend</name>
     <description>API REST para clientes, cuentas y movimientos de una entidad financiera</description>
 
