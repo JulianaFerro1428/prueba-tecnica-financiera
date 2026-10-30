@@ -25,3 +25,10 @@ export interface Account {
   createdAt: string;
   updatedAt: string;
 }
+
+/** Datos para abrir una cuenta. El número, el estado y el saldo los decide el backend. */
+export interface OpenAccountRequest {
+  clientId: number;
+  type: AccountType;
+  gmfExempt: boolean;
+}

@@ -1,8 +1,10 @@
 import { CurrencyPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Observable, forkJoin } from 'rxjs';
 
 import { apiErrorMessage } from '../../../../core/http/api-error';
+import { readNavigationNotice } from '../../../../core/navigation/navigation-notice';
 import { ClientService } from '../../../clients/services/client.service';
 import { ACCOUNT_STATUS_LABELS, ACCOUNT_TYPE_LABELS, Account } from '../../models/account.model';
 import { AccountService } from '../../services/account.service';
@@ -17,7 +19,7 @@ interface Notice {
 /** Pantalla con todas las cuentas: muestra su dueño y permite activarlas, inactivarlas o cancelarlas. */
 @Component({
   selector: 'app-account-list',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, RouterLink],
   templateUrl: './account-list.html',
   styleUrl: './account-list.css',
 })
@@ -37,6 +39,10 @@ export class AccountList {
   protected readonly confirmingCancelId = signal<number | null>(null);
 
   constructor() {
+    const savedNotice = readNavigationNotice();
+    if (savedNotice) {
+      this.notice.set({ kind: 'success', text: savedNotice });
+    }
     this.load();
   }
 
