@@ -1,0 +1,25 @@
+# Archivos locales de trabajo que no forman parte del código fuente
+CLAUDE.md
+.claude/
+Prueba Tecnica.pdf
+
+# Variables de entorno con valores reales (solo se versiona .env.example)
+.env
+
+# Backend (Java / Maven)
+backend/target/
+*.class
+*.log
+
+# Frontend (Angular / Node)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# IDEs y sistema operativo
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
