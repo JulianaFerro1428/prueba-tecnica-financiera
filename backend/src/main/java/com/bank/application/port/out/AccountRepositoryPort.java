@@ -12,6 +12,12 @@ public interface AccountRepositoryPort {
 
     Optional<Account> findById(Long id);
 
+    /**
+     * Busca la cuenta y la reserva hasta que termine la transacción actual: otra operación que quiera
+     * mover dinero en esa misma cuenta espera su turno. Así dos retiros simultáneos no leen el mismo saldo.
+     */
+    Optional<Account> findByIdForUpdate(Long id);
+
     List<Account> findAll();
 
     List<Account> findByClientId(Long clientId);
