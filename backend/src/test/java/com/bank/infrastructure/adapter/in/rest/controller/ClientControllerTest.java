@@ -4,6 +4,9 @@ import com.bank.application.port.in.CreateClientUseCase;
 import com.bank.application.port.in.DeleteClientUseCase;
 import com.bank.application.port.in.GetClientUseCase;
 import com.bank.application.port.in.UpdateClientUseCase;
+import com.bank.domain.exception.ClientNotFoundException;
+import com.bank.domain.exception.DuplicateIdentificationException;
+import com.bank.domain.exception.UnderageClientException;
 import com.bank.domain.model.Client;
 import com.bank.domain.model.ClientDetails;
 import com.bank.domain.model.IdentificationType;
@@ -77,9 +80,44 @@ class ClientControllerTest {
         String invalidBody = VALID_BODY.replace("maria@mail.com", "maria@mail").replace("\"María\"", "\"M\"");
 
         mockMvc.perform(post("/api/clients").contentType(MediaType.APPLICATION_JSON).content(invalidBody))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.email").exists())
+                .andExpect(jsonPath("$.errors.firstNames").exists());
 
         verify(createClient, never()).create(any());
+    }
+
+    @Test
+    void create_underageClient_returns422WithMessage() throws Exception {
+        when(createClient.create(any())).thenThrow(new UnderageClientException());
+
+        mockMvc.perform(post("/api/clients").contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.detail").value("El cliente debe ser mayor de edad"));
+    }
+
+    @Test
+    void create_duplicateIdentification_returns409() throws Exception {
+        when(createClient.create(any()))
+                .thenThrow(new DuplicateIdentificationException(IdentificationType.CC, "1012345678"));
+
+        mockMvc.perform(post("/api/clients").contentType(MediaType.APPLICATION_JSON).content(VALID_BODY))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void getById_unknownClient_returns404() throws Exception {
+        when(getClient.getById(99L)).thenThrow(new ClientNotFoundException(99L));
+
+        mockMvc.perform(get("/api/clients/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value("No existe un cliente con id 99"));
+    }
+
+    @Test
+    void getById_nonNumericId_returns400() throws Exception {
+        mockMvc.perform(get("/api/clients/abc"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
