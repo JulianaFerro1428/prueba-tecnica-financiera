@@ -30,7 +30,7 @@ export class AccountList {
 
   protected readonly accounts = signal<Account[]>([]);
   /** Nombre del dueño por id de cliente, para no mostrar solo un número. */
-  protected readonly ownerNames = signal<Record<number, string>>({});
+  protected readonly ownerNames = signal<Partial<Record<number, string>>>({});
   protected readonly loadState = signal<LoadState>('loading');
   protected readonly loadError = signal('');
   protected readonly notice = signal<Notice | null>(null);
