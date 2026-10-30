@@ -13,4 +13,20 @@ export class AccountService {
   getAll(): Observable<Account[]> {
     return this.http.get<Account[]>(this.baseUrl);
   }
+
+  activate(id: number): Observable<Account> {
+    return this.changeStatus(id, 'activate');
+  }
+
+  deactivate(id: number): Observable<Account> {
+    return this.changeStatus(id, 'deactivate');
+  }
+
+  cancel(id: number): Observable<Account> {
+    return this.changeStatus(id, 'cancel');
+  }
+
+  private changeStatus(id: number, action: 'activate' | 'deactivate' | 'cancel'): Observable<Account> {
+    return this.http.patch<Account>(`${this.baseUrl}/${id}/${action}`, null);
+  }
 }

@@ -12,4 +12,9 @@ export const routes: Routes = [
   },
   { path: 'clients/new', title: 'Registrar cliente · Ventanilla', loadComponent: clientForm },
   { path: 'clients/:id/edit', title: 'Editar cliente · Ventanilla', loadComponent: clientForm },
+  {
+    path: 'accounts',
+    title: 'Cuentas · Ventanilla',
+    loadComponent: () => import('./features/accounts/pages/account-list/account-list').then((m) => m.AccountList),
+  },
 ];
