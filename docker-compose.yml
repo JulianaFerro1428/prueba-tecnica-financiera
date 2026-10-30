@@ -17,5 +17,29 @@ services:
       timeout: 5s
       retries: 10
 
+  backend:
+    build: ./backend
+    container_name: bank-backend
+    environment:
+      # Dentro de la red de Compose la base de datos se llama "db" y escucha en su puerto interno 5432.
+      DB_URL: jdbc:postgresql://db:5432/${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      # Expuesto solo para probar la API directamente (curl, Postman); el frontend la usa por dentro.
+      - "${BACKEND_PORT:-8082}:8081"
+    depends_on:
+      db:
+        # Espera a que PostgreSQL acepte conexiones, no solo a que el contenedor exista.
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: bank-frontend
+    ports:
+      - "${FRONTEND_PORT:-8090}:80"
+    depends_on:
+      - backend
+
 volumes:
   db-data:

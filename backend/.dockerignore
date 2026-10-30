@@ -1,0 +1,4 @@
+# Lo que Docker no necesita copiar para construir la imagen.
+target/
+*.iml
+.idea/

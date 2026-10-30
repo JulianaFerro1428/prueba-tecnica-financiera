@@ -1,0 +1,5 @@
+# Lo que Docker no necesita copiar: se instala o se genera dentro de la imagen.
+node_modules/
+dist/
+.angular/
+.vscode/
