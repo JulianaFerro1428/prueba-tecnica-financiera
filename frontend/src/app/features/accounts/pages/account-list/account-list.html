@@ -36,7 +36,9 @@
           <tbody>
             @for (account of accounts(); track account.id) {
               <tr>
-                <td data-label="Número" class="figures">{{ account.number }}</td>
+                <td data-label="Número" class="figures">
+                  <a [routerLink]="['/accounts', account.id]" [attr.aria-label]="'Ver estado de cuenta ' + account.number">{{ account.number }}</a>
+                </td>
                 <td data-label="Tipo">
                   <span class="type-badge" [class]="'type-badge ' + account.type">{{ typeLabels[account.type] }}</span>
                   @if (account.gmfExempt) { <span class="gmf">Exenta GMF</span> }

@@ -22,4 +22,10 @@ export const routes: Routes = [
     title: 'Abrir cuenta · Ventanilla',
     loadComponent: () => import('./features/accounts/pages/account-form/account-form').then((m) => m.AccountForm),
   },
+  {
+    path: 'accounts/:id',
+    title: 'Estado de cuenta · Ventanilla',
+    loadComponent: () =>
+      import('./features/accounts/pages/account-statement/account-statement').then((m) => m.AccountStatement),
+  },
 ];
