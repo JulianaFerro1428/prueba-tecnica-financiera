@@ -1,0 +1,83 @@
+<header class="page-header">
+  <h1>Transferir</h1>
+</header>
+
+@if (options(); as list) {
+  @if (list.length < 2) {
+    <div class="panel empty">
+      <p>Se necesitan al menos dos cuentas activas para transferir.</p>
+      <a class="btn" routerLink="/accounts">Ir a cuentas</a>
+    </div>
+  } @else {
+    <form class="panel" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="route">
+        <div class="field">
+          <label for="source">Desde</label>
+          <select id="source" formControlName="sourceAccountId" [class.invalid]="showError('sourceAccountId')">
+            <option value="" disabled>Cuenta de origen</option>
+            @for (option of list; track option.account.id) {
+              <option [value]="option.account.id">
+                {{ option.account.number }} · {{ typeLabels[option.account.type] }} · {{ option.ownerName }} ·
+                {{ option.account.balance | currency: 'COP' : 'symbol-narrow' : '1.2-2' }}
+              </option>
+            }
+          </select>
+          @if (showError('sourceAccountId')) { <small class="error">Elige la cuenta de origen</small> }
+        </div>
+
+        <span class="arrow" aria-hidden="true">→</span>
+
+        <div class="field">
+          <label for="target">Hacia</label>
+          <select id="target" formControlName="targetAccountId"
+                  [class.invalid]="showError('targetAccountId') || sameAccountError()">
+            <option value="" disabled>Cuenta de destino</option>
+            @for (option of list; track option.account.id) {
+              <option [value]="option.account.id">
+                {{ option.account.number }} · {{ typeLabels[option.account.type] }} · {{ option.ownerName }}
+              </option>
+            }
+          </select>
+          @if (showError('targetAccountId')) {
+            <small class="error">Elige la cuenta de destino</small>
+          } @else if (sameAccountError()) {
+            <small class="error">La cuenta de destino debe ser distinta a la de origen</small>
+          }
+        </div>
+      </div>
+
+      <div class="field amount-field">
+        <label for="amount">Monto</label>
+        <div class="amount-input" [class.invalid]="amountError()">
+          <span aria-hidden="true">$</span>
+          <input id="amount" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="50000"
+                 formControlName="amount" [attr.aria-describedby]="amountError() ? 'amount-error' : null" />
+        </div>
+        @if (amountError(); as message) {
+          <small id="amount-error" class="error">{{ message }}</small>
+        }
+      </div>
+
+      @if (success(); as done) {
+        <div class="form-success" role="status">
+          <p>{{ done.text }}</p>
+          <p class="links">
+            <a [routerLink]="['/accounts', done.sourceId]">Ver cuenta de origen</a>
+            <a [routerLink]="['/accounts', done.targetId]">Ver cuenta de destino</a>
+          </p>
+        </div>
+      }
+      @if (serverError()) {
+        <p class="form-error" role="alert">{{ serverError() }}</p>
+      }
+
+      <div class="actions">
+        <button type="submit" class="btn" [disabled]="saving()">{{ saving() ? 'Transfiriendo…' : 'Transferir' }}</button>
+      </div>
+    </form>
+  }
+} @else if (loadError()) {
+  <p class="state state-error" role="alert">{{ loadError() }}</p>
+} @else {
+  <p class="state" aria-live="polite">Cargando cuentas…</p>
+}

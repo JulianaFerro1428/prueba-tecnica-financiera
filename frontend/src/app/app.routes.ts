@@ -28,4 +28,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/accounts/pages/account-statement/account-statement').then((m) => m.AccountStatement),
   },
+  {
+    path: 'transfers',
+    title: 'Transferir · Ventanilla',
+    loadComponent: () => import('./features/transactions/pages/transfer-form/transfer-form').then((m) => m.TransferForm),
+  },
 ];

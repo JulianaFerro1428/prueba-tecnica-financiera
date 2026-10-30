@@ -203,6 +203,60 @@ h2 {
   color: var(--color-danger);
 }
 
+/* Campo de monto con el signo $ delante: consignar, retirar y transferir. */
+.amount-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+
+.amount-input:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.amount-input.invalid {
+  border-color: var(--color-danger);
+}
+
+.amount-input span {
+  color: var(--color-muted);
+}
+
+.amount-input input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.625rem 0;
+  border: none;
+  outline: none;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+}
+
+/* Resultado de una operación dentro de un formulario. */
+.form-success,
+.form-error {
+  flex-basis: 100%;
+  margin: 0;
+  padding: 0.75rem var(--space-4);
+  border-radius: var(--radius);
+}
+
+.form-success {
+  background: var(--color-savings-soft);
+  color: #2f7d66;
+}
+
+.form-error {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
 /* Insignias de cuenta: se usan en la lista de cuentas y en el estado de cuenta. */
 .ledger .amount {
   text-align: right;

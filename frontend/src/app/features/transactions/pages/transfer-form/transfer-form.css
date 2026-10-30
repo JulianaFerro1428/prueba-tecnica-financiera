@@ -1,0 +1,102 @@
+form,
+.empty {
+  max-width: 760px;
+}
+
+form {
+  display: grid;
+  gap: var(--space-6);
+}
+
+/* Origen → destino en una fila; en pantallas angostas se apilan y la flecha apunta hacia abajo. */
+.route {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: var(--space-4);
+}
+
+.arrow {
+  margin-top: 2.125rem;
+  font-size: 1.25rem;
+  color: var(--color-primary);
+}
+
+.field {
+  display: grid;
+  gap: 0.375rem;
+  min-width: 0;
+  font-weight: 500;
+}
+
+.amount-field {
+  max-width: 20rem;
+}
+
+select {
+  width: 100%;
+  font: inherit;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+select.invalid {
+  border-color: var(--color-danger);
+}
+
+.error {
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: var(--color-danger);
+}
+
+.form-success p {
+  margin: 0;
+}
+
+.form-success .links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.links a {
+  color: inherit;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.empty p {
+  margin-top: 0;
+}
+
+@media (max-width: 720px) {
+  .route {
+    grid-template-columns: 1fr;
+  }
+
+  .arrow {
+    margin: 0;
+    transform: rotate(90deg);
+    justify-self: start;
+  }
+}
