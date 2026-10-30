@@ -1,45 +1,99 @@
-.topbar {
-  display: flex;
-  align-items: stretch;
-  gap: var(--space-6);
-  padding: 0 var(--space-4);
-  height: 56px;
-  background: var(--color-primary);
+.layout {
+  display: grid;
+  grid-template-columns: 232px 1fr;
+  min-height: 100vh;
 }
 
-.topbar a {
-  display: flex;
-  align-items: center;
-  color: #fff;
-  text-decoration: none;
+.sidebar {
+  background: var(--color-sidebar);
+  padding: var(--space-6) var(--space-4);
 }
 
 .brand {
-  font-size: 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin: 0 var(--space-2) var(--space-8);
+  font-size: 1.1875rem;
   font-weight: 700;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--color-savings), var(--color-checking));
+  color: #fff;
 }
 
 nav {
   display: flex;
-  gap: var(--space-4);
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 nav a {
-  opacity: 0.8;
-  border-bottom: 3px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 12px;
+  color: var(--color-muted);
+  font-weight: 500;
+  text-decoration: none;
 }
 
-nav a:hover,
-nav a.active {
-  opacity: 1;
+nav svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+nav a:hover {
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.6);
 }
 
 nav a.active {
-  border-bottom-color: #fff;
+  color: var(--color-primary);
+  background: var(--color-surface);
+  font-weight: 600;
+  box-shadow: var(--shadow);
 }
 
 .content {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: var(--space-6) var(--space-4);
+  width: 100%;
+  max-width: 1180px;
+  padding: var(--space-8);
+}
+
+/* En pantallas angostas el menú pasa arriba, en una fila. */
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    overflow-x: auto;
+  }
+
+  .brand {
+    margin: 0;
+  }
+
+  nav {
+    flex-direction: row;
+  }
+
+  .content {
+    padding: var(--space-6) var(--space-4);
+  }
 }
