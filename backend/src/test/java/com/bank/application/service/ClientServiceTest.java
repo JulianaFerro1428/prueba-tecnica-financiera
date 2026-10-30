@@ -1,6 +1,8 @@
 package com.bank.application.service;
 
+import com.bank.application.port.out.AccountRepositoryPort;
 import com.bank.application.port.out.ClientRepositoryPort;
+import com.bank.domain.exception.ClientHasAccountsException;
 import com.bank.domain.exception.ClientNotFoundException;
 import com.bank.domain.exception.DuplicateIdentificationException;
 import com.bank.domain.exception.UnderageClientException;
@@ -35,13 +37,15 @@ class ClientServiceTest {
 
     @Mock
     private ClientRepositoryPort clientRepository;
+    @Mock
+    private AccountRepositoryPort accountRepository;
 
     private ClientService clientService;
 
     @BeforeEach
     void setUp() {
         Clock fixedClock = Clock.fixed(NOW.toInstant(ZoneOffset.UTC), ZoneOffset.UTC);
-        clientService = new ClientService(clientRepository, fixedClock);
+        clientService = new ClientService(clientRepository, accountRepository, fixedClock);
     }
 
     @Test
@@ -112,12 +116,23 @@ class ClientServiceTest {
     }
 
     @Test
-    void delete_existingClient_isDeleted() {
+    void delete_clientWithoutAccounts_isDeleted() {
         when(clientRepository.findById(7L)).thenReturn(Optional.of(storedClient(7L)));
+        when(accountRepository.existsByClientId(7L)).thenReturn(false);
 
         clientService.delete(7L);
 
         verify(clientRepository).deleteById(7L);
+    }
+
+    @Test
+    void delete_clientWithAccounts_isRejectedAndNotDeleted() {
+        when(clientRepository.findById(7L)).thenReturn(Optional.of(storedClient(7L)));
+        when(accountRepository.existsByClientId(7L)).thenReturn(true);
+
+        assertThatThrownBy(() -> clientService.delete(7L))
+                .isInstanceOf(ClientHasAccountsException.class);
+        verify(clientRepository, never()).deleteById(any());
     }
 
     @Test
