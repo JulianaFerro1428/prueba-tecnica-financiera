@@ -1,8 +1,9 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 import { apiErrorMessage } from '../../../../core/http/api-error';
+import { readNavigationNotice } from '../../../../core/navigation/navigation-notice';
 import { Client } from '../../models/client.model';
 import { ClientService } from '../../services/client.service';
 
@@ -30,9 +31,8 @@ export class ClientList {
   protected readonly confirmingId = signal<number | null>(null);
 
   constructor() {
-    // El formulario envía aquí el mensaje de éxito ("Cliente ... registrado.") al volver a la lista.
-    const savedNotice = inject(Router).currentNavigation()?.extras.state?.['notice'];
-    if (typeof savedNotice === 'string') {
+    const savedNotice = readNavigationNotice();
+    if (savedNotice) {
       this.notice.set({ kind: 'success', text: savedNotice });
     }
     this.load();

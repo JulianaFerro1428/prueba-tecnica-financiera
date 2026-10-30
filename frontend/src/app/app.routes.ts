@@ -17,4 +17,9 @@ export const routes: Routes = [
     title: 'Cuentas · Ventanilla',
     loadComponent: () => import('./features/accounts/pages/account-list/account-list').then((m) => m.AccountList),
   },
+  {
+    path: 'accounts/new',
+    title: 'Abrir cuenta · Ventanilla',
+    loadComponent: () => import('./features/accounts/pages/account-form/account-form').then((m) => m.AccountForm),
+  },
 ];
