@@ -7,6 +7,7 @@ import com.bank.application.port.out.ClientRepositoryPort;
 import com.bank.domain.exception.AccountBalanceNotZeroException;
 import com.bank.domain.exception.AccountNotFoundException;
 import com.bank.domain.exception.ClientNotFoundException;
+import com.bank.domain.exception.DuplicateAccountTypeException;
 import com.bank.domain.model.Account;
 import com.bank.domain.model.AccountNumber;
 import com.bank.domain.model.AccountStatus;
@@ -25,6 +26,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,6 +83,45 @@ class AccountServiceTest {
     }
 
     @Test
+    void open_clientWithInactiveAccountOfSameType_isRejectedWithoutUsingSequenceOrSaving() {
+        when(clientRepository.findById(7L)).thenReturn(Optional.of(existingClient(7L)));
+        when(accountRepository.findByClientId(7L))
+                .thenReturn(List.of(storedAccount(AccountType.SAVINGS, AccountStatus.INACTIVE)));
+
+        assertThatThrownBy(() -> accountService.open(new OpenAccountCommand(7L, AccountType.SAVINGS, false)))
+                .isInstanceOf(DuplicateAccountTypeException.class)
+                .hasMessageContaining("5300000001");
+        verifyNoInteractions(numberSequence);
+        verify(accountRepository, never()).save(any());
+    }
+
+    @Test
+    void open_clientWithAccountOfOtherType_opensIt() {
+        when(clientRepository.findById(7L)).thenReturn(Optional.of(existingClient(7L)));
+        when(accountRepository.findByClientId(7L))
+                .thenReturn(List.of(storedAccount(AccountType.SAVINGS, AccountStatus.ACTIVE)));
+        when(numberSequence.nextSequence(AccountType.CHECKING)).thenReturn(2L);
+        when(accountRepository.save(any(Account.class))).thenAnswer(call -> call.getArgument(0));
+
+        Account account = accountService.open(new OpenAccountCommand(7L, AccountType.CHECKING, false));
+
+        assertThat(account.getNumber().value()).isEqualTo("3300000002");
+    }
+
+    @Test
+    void open_clientWhoseOnlyAccountOfThatTypeIsCancelled_opensANewOne() {
+        when(clientRepository.findById(7L)).thenReturn(Optional.of(existingClient(7L)));
+        when(accountRepository.findByClientId(7L))
+                .thenReturn(List.of(storedAccount(AccountType.SAVINGS, AccountStatus.CANCELLED)));
+        when(numberSequence.nextSequence(AccountType.SAVINGS)).thenReturn(8L);
+        when(accountRepository.save(any(Account.class))).thenAnswer(call -> call.getArgument(0));
+
+        Account account = accountService.open(new OpenAccountCommand(7L, AccountType.SAVINGS, false));
+
+        assertThat(account.getNumber().value()).isEqualTo("5300000008");
+    }
+
+    @Test
     void getById_unknownAccount_throwsNotFound() {
         when(accountRepository.findById(5L)).thenReturn(Optional.empty());
 
@@ -120,6 +161,12 @@ class AccountServiceTest {
         ClientDetails details = new ClientDetails(IdentificationType.CC, "1012345678",
                 "María", "Gómez", "maria@mail.com", LocalDate.of(1995, 5, 20));
         return Client.restore(id, details, NOW.minusYears(1), NOW.minusYears(1));
+    }
+
+    private static Account storedAccount(AccountType type, AccountStatus status) {
+        LocalDateTime createdAt = NOW.minusMonths(1);
+        return Account.restore(1L, type, new AccountNumber(type.numberPrefix() + "00000001"), status,
+                BigDecimal.ZERO, BigDecimal.ZERO, false, 7L, createdAt, createdAt);
     }
 
     private static Account storedAccount(String balance) {

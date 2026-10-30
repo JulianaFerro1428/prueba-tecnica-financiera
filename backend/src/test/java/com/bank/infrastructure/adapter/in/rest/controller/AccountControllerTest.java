@@ -6,6 +6,7 @@ import com.bank.application.port.in.OpenAccountCommand;
 import com.bank.application.port.in.OpenAccountUseCase;
 import com.bank.domain.exception.AccountBalanceNotZeroException;
 import com.bank.domain.exception.AccountNotFoundException;
+import com.bank.domain.exception.DuplicateAccountTypeException;
 import com.bank.domain.model.Account;
 import com.bank.domain.model.AccountNumber;
 import com.bank.domain.model.AccountStatus;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -70,6 +72,17 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.errors.type").exists());
 
         verify(openAccount, never()).open(any());
+    }
+
+    @Test
+    void open_clientAlreadyHasThatType_returns409WithReason() throws Exception {
+        when(openAccount.open(any(OpenAccountCommand.class))).thenThrow(
+                new DuplicateAccountTypeException(AccountType.SAVINGS, new AccountNumber("5300000001")));
+
+        mockMvc.perform(post("/api/accounts").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"clientId\":7,\"type\":\"SAVINGS\",\"gmfExempt\":false}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value(containsString("5300000001")));
     }
 
     @Test
