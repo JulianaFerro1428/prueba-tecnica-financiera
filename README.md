@@ -11,6 +11,7 @@ Aplicación para los trabajadores de una entidad financiera. Permite administrar
 | Frontend | Angular 21, TypeScript, nginx (en Docker) |
 | Pruebas | JUnit 5, Mockito, Testcontainers y JaCoCo (backend); Vitest (frontend) |
 | Contenedores | Docker y Docker Compose |
+| Nube | AWS EC2 (una máquina con el mismo Docker Compose) |
 
 ## Ejecución con Docker (todo junto)
 
@@ -42,6 +43,50 @@ docker compose down               # detener y borrar contenedores (los datos se 
 ```
 
 `docker compose down -v` también borra el volumen, es decir, **todos los datos** de la base de datos.
+
+## Despliegue en AWS
+
+La aplicación corre en **una sola instancia EC2** (un servidor alquilado a AWS) que ejecuta el mismo `docker-compose.yml`. Se eligió así porque reutiliza lo que ya funciona en local, cabe en el plan gratuito y se borra en minutos; para más usuarios se migraría a servicios administrados (RDS, ECS) sin cambiar el código, porque la conexión a la base de datos llega por variables de entorno.
+
+```text
+Navegador ──http:80──► EC2 t3.small (Ubuntu 24.04, región us-east-2)
+                       └─ Docker Compose: frontend (nginx) ──/api──► backend ──► db
+```
+
+| Recurso | Configuración | Por qué |
+| --- | --- | --- |
+| Instancia EC2 `bank-app` | `t3.small` (2 GB RAM + 2 GB de swap), modo de CPU *standard* | Spring Boot y PostgreSQL no caben con holgura en 1 GB; *standard* evita cobros por uso extra de CPU |
+| Disco | 20 GB gp3, cifrado | Guarda las imágenes y el volumen de la base de datos |
+| Security Group `bank-app-sg` | Puerto 80 abierto a internet; 22 (SSH) solo desde la IP del administrador | La API (8082) y PostgreSQL (5433) no son accesibles desde fuera |
+| Metadatos | IMDSv2 obligatorio | Impide que una petición maliciosa robe credenciales de la máquina |
+| Llave SSH `bank-ec2` | Guardada fuera del repositorio | Acceso de administración al servidor |
+
+**Cómo se desplegó:**
+
+1. Construir las imágenes en local y empaquetarlas (compilar en un servidor de 2 GB es lento):
+   ```bash
+   docker compose build
+   docker save prueba-backend:latest prueba-frontend:latest | gzip > bank-images.tar.gz
+   ```
+2. Copiarlas al servidor junto con el Compose:
+   ```bash
+   scp -i ~/.ssh/bank-ec2.pem bank-images.tar.gz docker-compose.yml ubuntu@<IP-publica>:prueba/
+   ```
+3. En el servidor, cargar las imágenes, crear el `.env` con una contraseña aleatoria (generada allí, nunca en Git) y levantar:
+   ```bash
+   gunzip -c bank-images.tar.gz | docker load
+   docker compose up -d --no-build
+   ```
+   El `.env` del servidor usa `FRONTEND_PORT=80` para que la app abra en `http://<IP-publica>`.
+
+**Costo y limpieza:** la cuenta usa el plan gratuito de AWS (créditos, sin cobro a la tarjeta). La instancia consume créditos mientras está encendida; detenerla deja de consumirlos salvo el disco, pero cambia la IP pública. Para borrar todo:
+
+```bash
+aws ec2 terminate-instances --instance-ids <id-instancia>
+aws ec2 wait instance-terminated --instance-ids <id-instancia>
+aws ec2 delete-security-group --group-name bank-app-sg
+aws ec2 delete-key-pair --key-name bank-ec2
+```
 
 ## Ejecución local (desarrollo)
 
